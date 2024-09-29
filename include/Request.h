@@ -12,5 +12,5 @@ class Request{
         const int requested_floor;
         //optional - direction
     public:
-    
+
 };

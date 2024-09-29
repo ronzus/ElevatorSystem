@@ -5,10 +5,14 @@
 #include <queue>
 
 using namespace std;
+
 enum DIR{
     UP,
     DOWN
 };
+
+const int MAX_LEVEL = 5;
+
 class Elevator{
     private:
             const int id_;
@@ -16,12 +20,10 @@ class Elevator{
             DIR direction_;
             bool isDoorOpen_;
             float currLoad_;
-            
-
 
     public:
         //TODO Rule of 5
-        Elevator(int id);
+        Elevator(int id,int currLvl,DIR dir,float currLd);
 
         
         //consider changing to list
@@ -44,7 +46,7 @@ class Elevator{
         Getters & Setters
         */
 
-        void getId();
+        int getId();
 
         int getCurrLevel();
 

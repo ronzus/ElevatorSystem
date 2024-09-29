@@ -6,10 +6,14 @@
 #include <queue>
 
 using namespace std;
-
+enum Mode{
+    SIM,
+    RT
+};
 class ReqHandler{
     private:
         queue<Request> requestQueue;
+        Mode handlerMode;
     public:
 
 };
