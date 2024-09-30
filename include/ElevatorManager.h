@@ -3,27 +3,24 @@
 #include <Elevator.h>
 #include <string>
 #include <iostream>
-#include <list>
+#include <vector>
+#include <thread>
 
 using namespace std;
-enum Algorithm{ //Look into dynamic sched and moving in not stright dir (final final)
-    FCFS,
-    SSTF,
-    SCAN,
-    LOOK,
-    CSCAN,
-    CLOOK 
-};
+
 class ElevatorManager{
     private:
-            const Algorithm ALGO;
-            list<Elevator> elevators;
-            
+
+            Algorithm algo_;
+            vector<Elevator*> elevators;
+            vector<thread> elevthreads;
 
 
     public:
         //TODO Rule of 5
-        ElevatorManager(Algorithm schedAlgorithm);
+        ElevatorManager(Algorithm schedAlgorithm,int nelev);
+
+        void initElevators(int numofelevators);
 
         bool ProcessRequest(Request elevRequest);
 

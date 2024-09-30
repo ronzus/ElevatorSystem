@@ -1,8 +1,69 @@
 #include "Elevator.h"
+#include <thread>
 
 
-Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad ) : id_(id),currlevel_(currLvl),direction_(direction),isDoorOpen_(false),currLoad_(currLoad){};
+Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm elevalgo) : id_(id),currlevel_(currLvl),direction_(direction),isDoorOpen_(false),currLoad_(currLoad),algo(elevalgo){};
 
+    //Thread/Elevator action.
+
+    void Elevator::run(){
+        while(1){
+            if(!requests.empty())
+                this_thread::sleep_for(chrono::milliseconds(200000)); //filler ,need to put mutex
+            else{
+               
+                switch (this->algo)
+                {
+                case FCFS:
+                    int destfloor = requests.front();
+                    requests.pop_front();
+                    this_thread::sleep_for(chrono::milliseconds(1000*(abs(currlevel_ - destfloor)))); //no reason to use other functions? we aren't stopping so it doesn't matter. might still consider simulating floors when logging 
+                    currlevel_ = destfloor;
+                    printf("Elevator %d reached level %d",this->id_,this->currlevel_);
+                    break;
+                
+                case SSTF:
+                    int closestReq = calculateClosest();
+                    int destfloor = requests; // implement getter
+                    
+                    /* code */
+                    break;
+                
+                case SCAN:
+                    /* code */
+                    break;
+                
+                case LOOK:
+                    /* code */
+                    break;
+                
+                case CSCAN:
+                    /* code */
+                    break;
+                
+                case CLOOK:
+                    /* code */
+                    break;
+                
+                default:
+                    break;
+                }
+            }
+        }
+
+    };
+
+    int Elevator::calculateClosest(){ //can be implemented better
+        int ret = 0;
+        int minDiff = abs(currlevel_ - requests.front());
+        for(int i = 0 ; i < requests.size() ; i++){
+            int diff = abs(currlevel_ - requests.at(i));
+            if(diff < minDiff)
+                minDiff = diff;
+                ret = i;
+        }
+        return ret;
+    };
  
     //Elevator Operations
 

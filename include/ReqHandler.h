@@ -14,6 +14,7 @@ class ReqHandler{
     private:
         queue<Request> requestQueue;
         Mode handlerMode;
+        
     public:
 
 };

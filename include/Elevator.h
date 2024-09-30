@@ -2,7 +2,9 @@
 
 #include <string>
 #include <iostream>
-#include <queue>
+#include <deque>
+#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -11,24 +13,38 @@ enum DIR{
     DOWN
 };
 
+enum Algorithm{ //Look into dynamic sched and moving in not straight dir (final final)
+    FCFS = 1,
+    SSTF = 2,
+    SCAN = 3,
+    LOOK = 4,
+    CSCAN = 5,
+    CLOOK = 6 
+};
+
 const int MAX_LEVEL = 5;
 
 class Elevator{
-    private:
+    private:    //Add speed parameter
             const int id_;
             int currlevel_;
             DIR direction_;
             bool isDoorOpen_;
             float currLoad_;
+            Algorithm algo;
+            list<int> requests; // update to request ,mby change to map or set 
 
     public:
         //TODO Rule of 5
-        Elevator(int id,int currLvl,DIR dir,float currLd);
+        Elevator(int id,int currLvl,DIR dir,float currLd,Algorithm algo);
 
-        
+        void run();
+
+        int calculateClosest(); //calculate which request is closest to curr position.
+
         //consider changing to list
         //floors to visit
-        queue<int> floorQueue;
+        //queue<int> floorQueue;
 
         //Elevator movements
 
