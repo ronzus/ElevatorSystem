@@ -8,12 +8,12 @@
 
 using namespace std;
 
-enum DIR{
+enum class DIR{
     UP,
     DOWN
 };
 
-enum Algorithm{ //Look into dynamic sched and moving in not straight dir (final final)
+enum class Algorithm{ //Look into dynamic sched and moving in not straight dir (final final)
     FCFS = 1,
     SSTF = 2,
     SCAN = 3,
@@ -32,11 +32,13 @@ class Elevator{
             bool isDoorOpen_;
             float currLoad_;
             Algorithm algo;
-            list<int> requests; // update to request ,mby change to map or set 
+            vector<int> requests; // update to request ,mby change to map or set 
+            int startFloor_;
+            int endFloor_;
 
     public:
         //TODO Rule of 5
-        Elevator(int id,int currLvl,DIR dir,float currLd,Algorithm algo);
+        Elevator(int id,int currLvl,DIR dir,float currLd,Algorithm algo,int startFloor,int endFloor);
 
         void run();
 

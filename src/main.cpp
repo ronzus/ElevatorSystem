@@ -2,7 +2,7 @@
 
 
 int main(){
-    ElevatorManager manager(FCFS,3);
+    ElevatorManager manager(Algorithm::FCFS,3);
     
  return 0;   
 }

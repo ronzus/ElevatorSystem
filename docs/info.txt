@@ -1,0 +1,3 @@
+source #1:
+https://medium.com/@datafreakai/from-disks-to-elevators-applying-scheduling-algorithms-for-optimal-movement-8784fa0ea9e8
+used for understanding and writing the algorithms (Elevator.cpp)
