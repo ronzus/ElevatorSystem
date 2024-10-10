@@ -1,4 +1,4 @@
-#include "Elevator.h"
+#include "include/Elevator.h"
 #include <thread>
 #include <mutex>
 #include <algorithm>
@@ -18,50 +18,86 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                 int targetFloor = -1;
                 switch (this->algo)
                 {
-                case Algorithm::FCFS:
+                case Algorithm::FCFS:{
 
-                    targetFloor = requests.front();
+                    targetFloor = requests.front().requested_floor;
                     break;
-                
-                case Algorithm::SSTF:
+                    
+                }
+                case Algorithm::SSTF:{
 
                     int closestReq = calculateClosest(); //index
-                    targetFloor = requests[closestReq];             
+                    targetFloor = requests[closestReq].requested_floor;             
                     break;
-                
-                case Algorithm::SCAN:
-                    /* code */
-                      // Sort the requests
+
+                }
+                case Algorithm::SCAN:{
+
+                    // Sort the requests
                     sort(requests.begin(), requests.end());
                     
                     
-                    if(direction_ == DIR::UP){
-                        targetFloor = MAX_LEVEL; //??
+                    if(direction_ == DIR::UP ){
+                        //Look for the first request above ot at curr lvl
+                        auto it = std::find_if(this->requests.begin(),this->requests.end(),[&](Request req){
+
+                            return req.requested_floor >= this->currlevel_;
+
+                        });
+
+                        if(it != requests.end()){
+                            //There's a request above the current level
+                            targetFloor = (*it).requested_floor;
+
+                        } else {
+
+                            direction_ = DIR::DOWN;
+                            
+                            targetFloor = requests.back().requested_floor;
+                            
+                        }
+
+                    } else if(direction_ == DIR::DOWN) {
+
+                         auto it = std::find_if(requests.rbegin(),requests.rend(),[&](Request req){ 
+
+                            return req.requested_floor <= currlevel_;
+
+                        });
+
+                        if(it != requests.rend()) {
+
+                            targetFloor = (*it).requested_floor;
+
+                        } else {
+                            
+                            direction_ = DIR::UP;
+                            
+                            targetFloor = requests.front().requested_floor;
+
+                        }
+
                     }
-                    else{
-                        targetFloor = 0;    //??
-                    }
-                      // Sort the requests
-                    sort(requests.begin(), requests.end());
-                    
-                    
 
                     break;
-                
-                case Algorithm::LOOK:
+                }
+                case Algorithm::CSCAN:{
                     /* code */
                     break;
+                }
                 
-                case Algorithm::CSCAN:
+                case Algorithm::LOOK:{
                     /* code */
                     break;
-                
-                case Algorithm::CLOOK:
+                }
+                case Algorithm::CLOOK:{
                     /* code */
                     break;
-                
+                }
                 default:
+                {
                     break;
+                }
                 }
                  // Move towards the target floor step-by-step
                 if (currlevel_ < targetFloor) {
@@ -76,27 +112,30 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                 this_thread::sleep_for(chrono::milliseconds(1000));
 
                 // When the elevator reaches the target floor
-                if (currlevel_ == targetFloor) {
+                if(currlevel_ == targetFloor) {
                     printf("Elevator %d reached target floor %d\n", this->id_, targetFloor);
 
                     // Simulate opening and closing the door
-                    if (openDoor()) {
+                    if(openDoor()) {
                         printf("Elevator %d doors opened.\n", this->id_);
                         this_thread::sleep_for(chrono::milliseconds(2000));  // Doors stay open for 2 seconds
                         closeDoor();
                         printf("Elevator %d doors closed.\n", this->id_);
                     }
                 }
+
+                
             }
+
         }
 
     };
 
     int Elevator::calculateClosest(){ //can be implemented better
         int ret = 0;
-        int minDiff = abs(currlevel_ - requests.front());
-        for(int i = 0 ; i < requests.size() ; i++){
-            int diff = abs(currlevel_ - requests.at(i));
+        int minDiff = abs(currlevel_ - requests.front().requested_floor );
+        for(auto i = 0 ; i < requests.size() ; i++){ // auto is requests.size() type - long unsigned int
+            int diff = abs(currlevel_ - requests.at(i).requested_floor );
             if(diff < minDiff){
                 minDiff = diff;
                 ret = i;

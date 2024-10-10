@@ -5,6 +5,7 @@
 #include <deque>
 #include <list>
 #include <vector>
+#include <ReqHandler.h>
 
 using namespace std;
 
@@ -32,7 +33,7 @@ class Elevator{
             bool isDoorOpen_;
             float currLoad_;
             Algorithm algo;
-            vector<int> requests; // update to request ,mby change to map or set 
+            vector<Request> requests; // update to request ,mby change to map or set 
             int startFloor_;
             int endFloor_;
 
