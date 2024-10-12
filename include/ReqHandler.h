@@ -9,10 +9,10 @@ enum Mode{
     RT
 };
 struct Request {
-    const string request_id;
-    const string client_id; //optional
-    const int requested_floor;
-        //optional - direction
+    const int request_id;
+    const int entry_floor; //External request
+    const int requested_floor; //Internal request
+    int status; // -1 - not onboard , 0 - onboard, 1 - done
 
     //Comparison operators
 
@@ -23,15 +23,21 @@ struct Request {
 
     bool operator=(const Request& a) const
     {
-        return (request_id == a.request_id) && (client_id == a.client_id) && (requested_floor == a.requested_floor);
+        return  (request_id == a.request_id) && 
+                (status == a.status) && 
+                (entry_floor == a.entry_floor) && 
+                (requested_floor == a.requested_floor);
     }
 };
+
 class ReqHandler{
     private:
         queue<Request> requestQueue;
         Mode handlerMode;
         
     public:
+
+        Request rcreateRequest(int requestid,int entryFloor, int requestedFloor,int status);//Basically generate
 
 };
 

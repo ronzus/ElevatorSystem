@@ -13,6 +13,7 @@ class ElevatorManager{
             Algorithm algo_;
             vector<Elevator*> elevators;
             vector<thread> elevthreads;
+            deque<Request> requests; // update to request ,mby change to map or set 
 
 
     public:
@@ -22,6 +23,8 @@ class ElevatorManager{
         void initElevators(int numofelevators);
 
         bool ProcessRequest(Request elevRequest);
+
+        void ManageElevators();
 
 
 

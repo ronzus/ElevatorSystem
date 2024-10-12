@@ -11,10 +11,11 @@ using namespace std;
 
 enum class DIR{
     UP,
-    DOWN
+    DOWN,
+    IDLE
 };
 
-enum class Algorithm{ //Look into dynamic sched and moving in not straight dir (final final)
+enum class Algorithm{ 
     FCFS = 1,
     SSTF = 2,
     SCAN = 3,
@@ -33,9 +34,10 @@ class Elevator{
             bool isDoorOpen_;
             float currLoad_;
             Algorithm algo;
-            vector<Request> requests; // update to request ,mby change to map or set 
+            deque<int> requests; // only actual floors to visit ,without full request logic 
             int startFloor_;
             int endFloor_;
+            std::mutex ReqsMutex;
 
     public:
         //TODO Rule of 5
@@ -79,5 +81,8 @@ class Elevator{
 
         void setLoad(float newLoad);
 
+        deque<int> getRequests(); // I know this is passed by value.
+
+        void addRequest(Request& req); 
         
 }; // class Elevator

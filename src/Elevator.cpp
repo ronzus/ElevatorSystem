@@ -1,8 +1,8 @@
-#include "include/Elevator.h"
+#include "Elevator.h"
 #include <thread>
 #include <mutex>
 #include <algorithm>
-std::mutex mtx;
+
 
 Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm elevalgo,int startFloor,int endFloor) : id_(id),currlevel_(currLvl),direction_(direction),isDoorOpen_(false),currLoad_(currLoad),algo(elevalgo),startFloor_(startFloor),endFloor_(endFloor){};
 
@@ -10,8 +10,10 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
 
     void Elevator::run(){
         while(1){
-            // ADD a condition variable
-            std::lock_guard<std::mutex> lock(mtx);
+
+            //condition variable
+            std::unique_lock<std::mutex> lock(this->ReqsMutex);
+
             if(requests.empty())
                 this_thread::sleep_for(chrono::milliseconds(2000)); //filler ,need to put mutex
             else{
@@ -20,18 +22,18 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                 {
                 case Algorithm::FCFS:{
 
-                    targetFloor = requests.front().requested_floor;
+                    targetFloor = requests.front();
                     break;
-                    
+
                 }
                 case Algorithm::SSTF:{
 
                     int closestReq = calculateClosest(); //index
-                    targetFloor = requests[closestReq].requested_floor;             
+                    targetFloor = requests[closestReq];             
                     break;
 
                 }
-                case Algorithm::SCAN:{
+                case Algorithm::SCAN:{ // change so it goes to the top floor and not the top requested floor
 
                     // Sort the requests
                     sort(requests.begin(), requests.end());
@@ -39,41 +41,41 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                     
                     if(direction_ == DIR::UP ){
                         //Look for the first request above ot at curr lvl
-                        auto it = std::find_if(this->requests.begin(),this->requests.end(),[&](Request req){
+                        auto it = std::find_if(this->requests.begin(),this->requests.end(),[&](int req){
 
-                            return req.requested_floor >= this->currlevel_;
+                            return req >= this->currlevel_;
 
                         });
 
                         if(it != requests.end()){
                             //There's a request above the current level
-                            targetFloor = (*it).requested_floor;
+                            targetFloor = *it;
 
                         } else {
 
                             direction_ = DIR::DOWN;
                             
-                            targetFloor = requests.back().requested_floor;
+                            targetFloor = requests.back();
                             
                         }
 
                     } else if(direction_ == DIR::DOWN) {
 
-                         auto it = std::find_if(requests.rbegin(),requests.rend(),[&](Request req){ 
+                         auto it = std::find_if(requests.rbegin(),requests.rend(),[&](int req){ 
 
-                            return req.requested_floor <= currlevel_;
+                            return req <= currlevel_;
 
                         });
 
                         if(it != requests.rend()) {
 
-                            targetFloor = (*it).requested_floor;
+                            targetFloor = *it;
 
                         } else {
                             
                             direction_ = DIR::UP;
                             
-                            targetFloor = requests.front().requested_floor;
+                            targetFloor = requests.front();
 
                         }
 
@@ -82,8 +84,29 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                     break;
                 }
                 case Algorithm::CSCAN:{
-                    /* code */
+
+
+
+                    sort(requests.begin(), requests.end());
+
+                    auto it = std::find_if(requests.begin(),requests.end(),[&](int req){ 
+
+                        return req >= currlevel_;
+
+                    });
+
+                    if(it != requests.end()) {
+
+                        targetFloor = *it;
+
+                    } else {
+                                                    
+                        targetFloor = requests.front();
+
+                    }
+
                     break;
+                    
                 }
                 
                 case Algorithm::LOOK:{
@@ -114,6 +137,7 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                 // When the elevator reaches the target floor
                 if(currlevel_ == targetFloor) {
                     printf("Elevator %d reached target floor %d\n", this->id_, targetFloor);
+                    //remove request and add internal requests
 
                     // Simulate opening and closing the door
                     if(openDoor()) {
@@ -127,21 +151,31 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                 
             }
 
+            this->ReqsMutex.unlock();
         }
 
     };
 
     int Elevator::calculateClosest(){ //can be implemented better
         int ret = 0;
-        int minDiff = abs(currlevel_ - requests.front().requested_floor );
-        for(auto i = 0 ; i < requests.size() ; i++){ // auto is requests.size() type - long unsigned int
-            int diff = abs(currlevel_ - requests.at(i).requested_floor );
+        int minDiff = abs(currlevel_ - requests.front() );
+
+        // fix casting - not recommended (unless you are sure that requests.size will always fit within the range of an int).
+        for(int i = 0 ; i < static_cast<int>(requests.size()) ; i++){ 
+
+            int diff = abs(currlevel_ - requests.at(i) );
+
             if(diff < minDiff){
+
                 minDiff = diff;
                 ret = i;
+
             }
+
         }
+
         return ret;
+
     };
     
  
@@ -210,7 +244,7 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
 
     }
 
-    void Elevator::setCurrLevel(int level){
+    void Elevator::setCurrLevel(int level){ //do I really need this?
 
         this->currlevel_ = level;
 
@@ -241,5 +275,18 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
 
     }
 
+    deque<int> Elevator::getRequests(){
+        return requests;
+    }
 
+    void Elevator::addRequest(Request& req){
+        //TODO
+        std::unique_lock<std::mutex> lock(this->ReqsMutex);
+
+
+        this->ReqsMutex.unlock();
+
+        
+    }
+        
 
