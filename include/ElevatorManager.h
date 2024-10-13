@@ -1,11 +1,12 @@
 #pragma once
+
 #include <Elevator.h>
+#include <ReqHandler.h>
 #include <string>
 #include <iostream>
 #include <vector>
 #include <thread>
 
-using namespace std;
 
 class ElevatorManager{
     private:
@@ -30,3 +31,13 @@ class ElevatorManager{
 
         
 }; // class Elevator
+
+
+// struct for parsing
+struct init_data {
+        
+    int num_floors;
+    int num_elev;
+    vector<int> starting_floors;
+    vector<Request> requests;
+};

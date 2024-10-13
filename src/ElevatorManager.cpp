@@ -41,7 +41,7 @@ void ElevatorManager::ManageElevators() {
             if (!requestProcessed) {
                 std::cout << "No elevator available to handle the request" << std::endl;
             }
-            
+
         } else {
             lock.unlock();  // Unlock in case no requests are present
         }

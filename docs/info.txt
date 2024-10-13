@@ -1,16 +1,32 @@
+cpp coding conventions:
+https://google.github.io/styleguide/cppguide.html
+
 source used for understanding and writing the algorithms (Elevator.cpp):
 https://medium.com/@datafreakai/from-disks-to-elevators-applying-scheduling-algorithms-for-optimal-movement-8784fa0ea9e8
 
 for makefile:
 https://stackoverflow.com/questions/2908057/can-i-compile-all-cpp-files-in-src-to-os-in-obj-then-link-to-binary-in
 
+for json:
+https://github.com/nlohmann/json?tab=readme-ov-file#specializing-enum-conversion
+
 rule of 5/3/0:
 https://en.cppreference.com/w/cpp/language/rule_of_three
 
 12/10/24:
-1.add basic policy for request processing in ElevatorManager.
-2.add status field to Request struct (make atomic / add some sort of race condition solution)
+#TODO
+1.add basic policy for request processing in ElevatorManager - added but still not fully sure about the structure of requests in the program.
+2.add status field to Request struct (make atomic / add some sort of race condition solution) - added field.
 3.add to elevator class a ds for keeping track of requests he takes care of / clients (requests) via reference/pointer 
 4.add logic: only once a request entry_level is reached by a certain elevator a 
   ,then the dest_floor of that request would be added to the requests of elevator a.
 5.revise rule of 5/3 and implement.
+
+13/10/24:
+#TODO
+1.add status field to Request struct (make atomic / add some sort of race condition solution).
+2.add to elevator class a ds for keeping track of requests he takes care of / clients (requests) via reference/pointer 
+3.add logic: only once a request entry_level is reached by a certain elevator a 
+  ,then the dest_floor of that request would be added to the requests of elevator a.
+4.revise rule of 5/3 and implement.
+5.decide on request logic and implement into ReqHandler & ElevatorManager - done.

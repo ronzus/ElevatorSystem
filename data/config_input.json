@@ -1,0 +1,38 @@
+{
+    
+    "number of floors": 24,
+    "number of elevators": 4,
+    "starting floors" : [3, 6 ,19 ,21],
+    "events" : [ 
+        {
+            "time": 0,
+            "entry_floor": 0,
+            "dest_floor": 8
+        },
+        {
+            "time": 5,
+            "entry_floor": 4,
+            "dest_floor": 15
+        },
+        {
+            "time": 10,
+            "entry_floor": 7,
+            "dest_floor": 19
+        }, 
+        {
+            "time": 0,
+            "entry_floor":0,
+            "dest_floor":0
+        },    
+        {
+            "time": 0,
+            "entry_floor":0,
+            "dest_floor":0
+        },    
+        {
+            "time": 0,
+            "entry_floor":0,
+            "dest_floor":0
+        }        
+    ]
+}

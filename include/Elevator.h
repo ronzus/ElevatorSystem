@@ -1,13 +1,12 @@
-#pragma once
+#pragma once 
 
 #include <string>
 #include <iostream>
 #include <deque>
 #include <list>
 #include <vector>
-#include <ReqHandler.h>
 
-using namespace std;
+#include "ReqHandler.h"
 
 enum class DIR{
     UP,
@@ -49,7 +48,6 @@ class Elevator{
 
         //consider changing to list
         //floors to visit
-        //queue<int> floorQueue;
 
         //Elevator movements
 
@@ -71,7 +69,7 @@ class Elevator{
 
         int getCurrLevel();
 
-        void setCurrLevel(int level);
+        void setCurrLevel(int level);// remove
 
         DIR getDir();
 
