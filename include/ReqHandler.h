@@ -1,49 +1,27 @@
+
+/*
+    Copyright 2024 Ron Zusman
+*/ 
+
 #pragma once
 
+#include "../include/ElevatorManager.h"
 #include <string>
 #include <iostream>
+#include <vector>
 #include <queue>
+#include <thread>
 
-using namespace std;
-enum Mode{
-    SIM,
-    RT
-};
-struct Request {
 
-    int request_id;
-    int entry_floor; //External request
-    int requested_floor; //Internal request
-    int status; // -1 - not onboard , 0 - onboard, 1 - done
-
-    //Comparison operators
-
-    bool operator<(const Request &a) const
-    {
-        return requested_floor < a.requested_floor;
-    }
-
-    bool operator=(const Request &a) const
-    {
-        return  (request_id == a.request_id) && 
-                (status == a.status) && 
-                (entry_floor == a.entry_floor) && 
-                (requested_floor == a.requested_floor);
-    }
-};
 
 class ReqHandler{
-    private:
-        queue<Request> request_queue;
-        Mode handler_mode;
-        
-    public:
+ private:
+        std::vector<std::thread> thread_vector;
+        ElevatorManager& manager_;
 
-        ReqHandler(vector<Request> requests);
+ public:
+        ReqHandler(std::vector<Request> requests, ElevatorManager& manager);
 
-        void run();
-
-        Request CreateRequest(int requestid,int entryFloor, int requestedFloor);//Basically generate
-
+        void run(Request &req);
 };
 

@@ -1,21 +1,24 @@
+
+/*
+    Copyright 2024 Ron Zusman
+*/ 
+
 #include "Elevator.h"
 #include <thread>
 #include <mutex>
 #include <algorithm>
 
 
-Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm elevalgo,int startFloor,int endFloor) : id_(id),currlevel_(currLvl),direction_(direction),isDoorOpen_(false),currLoad_(currLoad),algo(elevalgo),startFloor_(startFloor),endFloor_(endFloor){};
 
-    //Thread/Elevator action.
+    // Thread/Elevator action.
 
-    void Elevator::run(){
-        while(1){
-
-            //condition variable
+    void Elevator::run() {
+        while (1) {
+            // condition variable
             std::unique_lock<std::mutex> lock(this->ReqsMutex);
 
             if(requests.empty())
-                this_thread::sleep_for(chrono::milliseconds(2000)); //filler ,need to put mutex
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // filler ,need to put mutex
             else{
                 int targetFloor = -1;
                 switch (this->algo)
@@ -132,7 +135,7 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                 }
 
                 // Simulate time between floor transitions
-                this_thread::sleep_for(chrono::milliseconds(1000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
                 // When the elevator reaches the target floor
                 if(currlevel_ == targetFloor) {
@@ -142,7 +145,7 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
                     // Simulate opening and closing the door
                     if(openDoor()) {
                         printf("Elevator %d doors opened.\n", this->id_);
-                        this_thread::sleep_for(chrono::milliseconds(2000));  // Doors stay open for 2 seconds
+                        std::this_thread::sleep_for(std::chrono::milliseconds(2000));  // Doors stay open for 2 seconds
                         closeDoor();
                         printf("Elevator %d doors closed.\n", this->id_);
                     }
@@ -154,7 +157,7 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
             this->ReqsMutex.unlock();
         }
 
-    };
+    }
 
     int Elevator::calculateClosest(){ //can be implemented better
         int ret = 0;
@@ -176,7 +179,7 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
 
         return ret;
 
-    };
+    }
     
  
     //Elevator Operations
@@ -275,12 +278,13 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
 
     }
 
-    deque<int> Elevator::getRequests(){
+    std::deque<int> Elevator::getRequests(){
         return requests;
     }
 
-    void Elevator::addRequest(Request& req){
-        //TODO
+/*
+    void Elevator::addRequest(const Request &req){
+        //TODO(ronzus): implement
         std::unique_lock<std::mutex> lock(this->ReqsMutex);
 
 
@@ -289,4 +293,4 @@ Elevator::Elevator(int id ,int currLvl, DIR direction,float currLoad,Algorithm e
         
     }
         
-
+*/

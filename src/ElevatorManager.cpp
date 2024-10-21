@@ -1,3 +1,8 @@
+
+/*
+    Copyright 2024 Ron Zusman
+*/ 
+
 #include "ElevatorManager.h"
 #include <algorithm>
 #include <mutex>
@@ -17,11 +22,11 @@ void ElevatorManager::initElevators(int nelev)
 {
     for (int i = 0; i < nelev; i++) {
 
-        Elevator* newElev = new Elevator(i, 0, DIR::UP, 0, this->algo_, 0, 5); // Review
+        Elevator* newElev = new Elevator(i, 0, DIR::IDLE, 0, this->algo_, 0, 5); // Review
         elevators.push_back(newElev);
 
         // Create the thread and move it into the vector
-        thread threadObj(&Elevator::run, *newElev);
+        std::thread threadObj(&Elevator::run, *newElev);
         elevthreads.push_back(std::move(threadObj));  // Use std::move here
     }
 }
@@ -63,11 +68,11 @@ bool ElevatorManager::ProcessRequest(Request req) {
 
         // If the elevator has the requested floor in its request queue, assign the new request to it
         if (it != temp.end()) {
-            elev->addRequest(req);
+            //elev->addRequest(req);
             return true;
         }
     }
     //if not found we'll just add it to elev[0]'s queue (temporary)
-    elevators[0]->addRequest(req);
+    //elevators[0]->addRequest(req);
     return true;
 }
