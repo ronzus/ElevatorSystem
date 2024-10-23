@@ -6,7 +6,11 @@
 #include "ElevatorManager.h"
 #include <algorithm>
 #include <mutex>
+#include <condition_variable>
 
+
+std::mutex reqMutex;  
+std::condition_variable cv_mng;
 
 ElevatorManager::ElevatorManager(Algorithm algo,int numOfElev) : algo_(algo){
     initElevators(numOfElev);
@@ -31,15 +35,15 @@ void ElevatorManager::initElevators(int nelev)
     }
 }
 
-std::mutex reqMutex;  
 
 void ElevatorManager::ManageElevators() {
     while (1) {
         std::unique_lock<std::mutex> lock(reqMutex);
+        cv_mng.wait(lock,[&]{ return !requests.empty(); });
+
         if (!requests.empty()) {
-            Request newRequest = requests.front();
+            Request& newRequest = requests.front();
             requests.pop_front();
-            lock.unlock();  // Unlock as soon as the request is retrieved
 
             bool requestProcessed = ProcessRequest(newRequest);
 
@@ -47,16 +51,13 @@ void ElevatorManager::ManageElevators() {
                 std::cout << "No elevator available to handle the request" << std::endl;
             }
 
-        } else {
-            lock.unlock();  // Unlock in case no requests are present
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+       
     }
 }
 
 
-bool ElevatorManager::ProcessRequest(Request req) {
+bool ElevatorManager::ProcessRequest(Request& req) {
 
     for (Elevator* elev : elevators) {
         std::deque<int> temp = elev->getRequests();
@@ -75,4 +76,11 @@ bool ElevatorManager::ProcessRequest(Request req) {
     //if not found we'll just add it to elev[0]'s queue (temporary)
     //elevators[0]->addRequest(req);
     return true;
+}
+
+void ElevatorManager::addRequest(Request& req) {
+    
+    std::unique_lock<std::mutex> lock(reqMutex);
+    this->requests.push_back(req);
+
 }

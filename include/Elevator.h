@@ -10,8 +10,9 @@
 #include <list>
 #include <vector>
 #include <mutex>
-
-//#include "ReqHandler.h"
+#include <condition_variable> 
+#include <unordered_map>
+#include "Request.h"
 
 enum class DIR{
     UP,
@@ -39,10 +40,14 @@ class Elevator {
     bool isDoorOpen_;
     float currLoad_;
     Algorithm algo;
-    std::deque<int> requests;  // only actual floors to visit
+    std::deque<int> floorsToVisit;  // only actual floors to visit
+    std::unordered_map<int,std::vector<Request&>> external_to_request; 
+    std::unordered_map<int,std::vector<Request&>> internal_to_request; 
     int startFloor_;
     int endFloor_;
     std::mutex ReqsMutex;
+    std::condition_variable cv;
+
 
  public:
     // Constructor
@@ -59,7 +64,7 @@ class Elevator {
     Elevator(const Elevator& other)
         : id_(other.id_), currlevel_(other.currlevel_), direction_(other.direction_),
           isDoorOpen_(other.isDoorOpen_), currLoad_(other.currLoad_), algo(other.algo),
-          requests(other.requests), startFloor_(other.startFloor_), endFloor_(other.endFloor_) {
+          floorsToVisit(other.floorsToVisit), startFloor_(other.startFloor_), endFloor_(other.endFloor_) {
         // Copying a mutex is not allowed, so we don't copy `ReqsMutex`
     }
 
@@ -74,7 +79,7 @@ class Elevator {
         isDoorOpen_ = other.isDoorOpen_;
         currLoad_ = other.currLoad_;
         algo = other.algo;
-        requests = other.requests;
+        floorsToVisit = other.floorsToVisit;
         startFloor_ = other.startFloor_;
         endFloor_ = other.endFloor_;
         // Don't copy `ReqsMutex` as mutexes can't be copied
@@ -85,7 +90,7 @@ class Elevator {
     Elevator(Elevator&& other) noexcept
         : id_(other.id_), currlevel_(std::move(other.currlevel_)), direction_(std::move(other.direction_)),
           isDoorOpen_(std::move(other.isDoorOpen_)), currLoad_(std::move(other.currLoad_)),
-          algo(std::move(other.algo)), requests(std::move(other.requests)),
+          algo(std::move(other.algo)), floorsToVisit(std::move(other.floorsToVisit)),
           startFloor_(std::move(other.startFloor_)), endFloor_(std::move(other.endFloor_)) {
         // Move mutex by default since we cannot move the mutex, we need to reconstruct it
         // Since the mutex object itself doesn't manage resources, there's no harm in letting the new Elevator object construct a new mutex.
@@ -103,7 +108,7 @@ class Elevator {
         isDoorOpen_ = std::move(other.isDoorOpen_);
         currLoad_ = std::move(other.currLoad_);
         algo = std::move(other.algo);
-        requests = std::move(other.requests);
+        floorsToVisit = std::move(other.floorsToVisit);
         startFloor_ = std::move(other.startFloor_);
         endFloor_ = std::move(other.endFloor_);
 
@@ -112,7 +117,6 @@ class Elevator {
         return *this;
     }
 
-    // The rest of the class remains unchanged
     void run();
     int calculateClosest();
     bool moveDOWN();
@@ -129,5 +133,5 @@ class Elevator {
     float getLoad();
     void setLoad(float newLoad);
     std::deque<int> getRequests();
-   // void addRequest(const Request &req);
+    void addRequest(Request &req);
 };

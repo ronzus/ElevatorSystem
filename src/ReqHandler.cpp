@@ -8,7 +8,7 @@
 #include "ReqHandler.h"
 
 
-ReqHandler::ReqHandler(std::vector<Request> requests, ElevatorManager& manager) : manager_(manager){
+ReqHandler::ReqHandler(std::vector<Request&> requests, ElevatorManager& manager) : manager_(manager){
     std::sort(requests.begin(),requests.end(),[&](Request reqA, Request reqB){
         return reqA.time < reqB.time;
     });

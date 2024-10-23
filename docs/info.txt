@@ -1,4 +1,4 @@
-cpp coding conventions:
+cpp coding conventions (following this using cpplint):
 https://google.github.io/styleguide/cppguide.html
 
 source used for understanding and writing the algorithms (Elevator.cpp):
@@ -15,3 +15,199 @@ https://en.cppreference.com/w/cpp/language/rule_of_three
 
 concurrency:
 https://www.bogotobogo.com/cplusplus/files/CplusplusConcurrencyInAction_PracticalMultithreading.pdf
+
+1. Mutex (std::mutex)
+
+    Purpose: A mutex (short for mutual exclusion) is the most basic mechanism to ensure that only one thread can access a particular section of code or resource at a time.
+    How it works: When a thread locks a mutex, other threads trying to lock it will block (wait) until the first thread releases the lock.
+    Usage:
+
+    cpp
+
+    std::mutex mtx;
+    mtx.lock();  // Lock the mutex
+    // Critical section
+    mtx.unlock();  // Unlock the mutex
+
+    Best Practice: Use a std::lock_guard or std::unique_lock to manage the lock automatically and avoid forgetting to unlock.
+
+2. Lock Guard (std::lock_guard)
+
+    Purpose: A RAII (Resource Acquisition Is Initialization) style wrapper around a mutex that ensures it gets unlocked when the lock guard goes out of scope.
+    How it works: Automatically locks the mutex when created and unlocks it when destroyed.
+    Usage:
+
+    cpp
+
+    std::mutex mtx;
+    void thread_func() {
+        std::lock_guard<std::mutex> guard(mtx);  // Automatically locks
+        // Critical section
+        // Automatically unlocks when `guard` goes out of scope
+    }
+
+    Best Practice: Use this to prevent deadlocks caused by failure to unlock a mutex in complex logic or exceptions.
+
+3. Unique Lock (std::unique_lock)
+
+    Purpose: A more flexible alternative to std::lock_guard, allowing deferred locking, manual unlocking, and re-locking.
+    How it works: Similar to lock_guard, but allows more control over when the lock is acquired and released.
+    Usage:
+
+    cpp
+
+    std::mutex mtx;
+    std::unique_lock<std::mutex> lock(mtx);  // Lock the mutex
+    // Critical section
+    lock.unlock();  // Manually unlock
+    lock.lock();    // Re-lock if needed
+
+    Best Practice: Use when you need more control over the lock, for example, when conditionally locking or unlocking a mutex.
+
+4. Recursive Mutex (std::recursive_mutex)
+
+    Purpose: Allows the same thread to lock the same mutex multiple times without causing a deadlock.
+    How it works: The thread that locks the mutex can re-lock it (incrementing the lock count). It must unlock the mutex the same number of times to fully release it.
+    Usage:
+
+    cpp
+
+    std::recursive_mutex rec_mtx;
+    rec_mtx.lock();   // First lock
+    rec_mtx.lock();   // Re-lock
+    rec_mtx.unlock(); // First unlock
+    rec_mtx.unlock(); // Fully unlocked
+
+    Best Practice: Only use when you absolutely need to allow multiple locks by the same thread, as it can lead to complex and error-prone code.
+
+5. Timed Mutex (std::timed_mutex, std::recursive_timed_mutex)
+
+    Purpose: Similar to std::mutex but allows a thread to attempt to lock it for a specified amount of time.
+    How it works: The thread tries to acquire the lock for a given duration. If the lock cannot be acquired within that time, the operation fails.
+    Usage:
+
+    cpp
+
+    std::timed_mutex tmtx;
+    if (tmtx.try_lock_for(std::chrono::milliseconds(100))) {
+        // Critical section
+        tmtx.unlock();
+    } else {
+        // Failed to acquire the lock within 100ms
+    }
+
+    Best Practice: Use when you want to avoid blocking indefinitely while waiting for a lock, especially in time-sensitive applications.
+
+6. Shared Mutex (std::shared_mutex)
+
+    Purpose: Allows multiple readers or a single writer to access a resource at the same time. Useful for scenarios with many read operations but few write operations.
+    How it works: Multiple threads can acquire the shared lock for reading, but only one thread can acquire the exclusive lock for writing.
+    Usage:
+
+    cpp
+
+    std::shared_mutex sh_mtx;
+    // For reading
+    sh_mtx.lock_shared();
+    // Critical section for reading
+    sh_mtx.unlock_shared();
+    // For writing
+    sh_mtx.lock();
+    // Critical section for writing
+    sh_mtx.unlock();
+
+    Best Practice: Use in read-heavy scenarios to minimize contention and maximize performance.
+
+7. Condition Variable (std::condition_variable)
+
+    Purpose: Allows threads to wait for a condition to become true and get notified when they can proceed. Often used with a mutex to synchronize threads.
+    How it works: Threads wait on a std::condition_variable until another thread signals that the condition is met, at which point the waiting threads are awakened.
+    Usage:
+
+    cpp
+
+    std::mutex mtx;
+    std::condition_variable cv;
+    bool ready = false;
+
+    void wait_thread() {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, []{ return ready; });  // Wait until `ready` is true
+        // Continue execution
+    }
+
+    void signal_thread() {
+        std::lock_guard<std::mutex> lock(mtx);
+        ready = true;
+        cv.notify_one();  // Wake up one waiting thread
+    }
+
+    Best Practice: Use to synchronize thread execution based on some shared state or condition.
+
+8. Atomic Operations (std::atomic)
+
+    Purpose: Provides a lock-free way to perform operations on shared variables. Operations like increment, decrement, load, and store are done atomically, ensuring thread safety.
+    How it works: Operations on std::atomic types are guaranteed to be atomic, meaning they complete without interruption and are visible to all threads.
+    Usage:
+
+    cpp
+
+    std::atomic<int> counter(0);
+    counter++;
+    counter.fetch_add(1);  // Equivalent to counter++
+
+    Best Practice: Use when you need to manipulate a single variable in a thread-safe way without the overhead of locking. It’s most useful for counters, flags, etc.
+
+9. Future and Promise (std::future, std::promise)
+
+    Purpose: Used for asynchronous computations and communication between threads. A thread can return a result to another thread using a std::promise that is fulfilled later.
+    How it works: A std::promise holds a value that can be set by one thread. Another thread can retrieve that value through a std::future object once the promise is fulfilled.
+    Usage:
+
+    cpp
+
+    std::promise<int> prom;
+    std::future<int> fut = prom.get_future();
+
+    // In thread 1:
+    prom.set_value(10);  // Fulfills the promise
+
+    // In thread 2:
+    int value = fut.get();  // Waits for the value to be set
+
+    Best Practice: Use when you need to pass a result from one thread to another or synchronize tasks based on a result.
+
+10. Semaphore (std::counting_semaphore)
+
+    Purpose: Controls access to a resource that allows a fixed number of concurrent accesses.
+    How it works: A semaphore has a counter that tracks how many threads can access a resource. Each acquire() call decreases the counter, and each release() call increases it.
+    Usage:
+
+    cpp
+
+    std::counting_semaphore<3> sem(3);  // Maximum 3 concurrent accesses
+    sem.acquire();  // Decrease the counter
+    // Access shared resource
+    sem.release();  // Increase the counter
+
+    Best Practice: Use for limiting concurrent access to shared resources (e.g., a connection pool) without needing to lock each access individually.
+
+11. Reader-Writer Lock (std::shared_mutex)
+
+    Purpose: Allows multiple threads to read data simultaneously, while ensuring exclusive access for writing. Optimizes performance when reads are more frequent than writes.
+    How it works: Supports both shared (read) locks and exclusive (write) locks. Multiple threads can hold a shared lock, but only one thread can hold the exclusive lock.
+    Usage:
+
+    cpp
+
+std::shared_mutex rw_mutex;
+rw_mutex.lock_shared();  // Shared lock for reading
+// Read data
+rw_mutex.unlock_shared();
+
+rw_mutex.lock();  // Exclusive lock for writing
+// Write data
+rw_mutex.unlock();
+
+Best Practice: Ideal when you expect more reads than writes, reducing contention between threads.
+

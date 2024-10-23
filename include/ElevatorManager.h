@@ -6,7 +6,6 @@
 #pragma once
 
 #include "../include/Elevator.h"
-#include "Request.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -25,8 +24,9 @@ class ElevatorManager{
     ElevatorManager(){};
     ElevatorManager(Algorithm schedAlgorithm, int nelev);
     void initElevators(int numofelevators);
-    bool ProcessRequest(Request elevRequest);
+    bool ProcessRequest(Request& elevRequest);
     void ManageElevators();
+    void addRequest(Request& elevRequest);
 };  // class Elevator
 
 
