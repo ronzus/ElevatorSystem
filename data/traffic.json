@@ -1,0 +1,109 @@
+{
+    "entries": [
+        {
+            "time": 0,
+            "entry_floor": 0,
+            "dest_floor": 8
+        },
+        {
+            "time": 5,
+            "entry_floor": 4,
+            "dest_floor": 15
+        },
+        {
+            "time": 10,
+            "entry_floor": 7,
+            "dest_floor": 19
+        },
+        {
+            "time": 12,
+            "entry_floor": 2,
+            "dest_floor": 14
+        },
+        {
+            "time": 15,
+            "entry_floor": 9,
+            "dest_floor": 1
+        },
+        {
+            "time": 18,
+            "entry_floor": 3,
+            "dest_floor": 11
+        },
+        {
+            "time": 20,
+            "entry_floor": 5,
+            "dest_floor": 2
+        },
+        {
+            "time": 22,
+            "entry_floor": 10,
+            "dest_floor": 20
+        },
+        {
+            "time": 25,
+            "entry_floor": 6,
+            "dest_floor": 3
+        },
+        {
+            "time": 30,
+            "entry_floor": 13,
+            "dest_floor": 22
+        },
+        {
+            "time": 33,
+            "entry_floor": 15,
+            "dest_floor": 0
+        },
+        {
+            "time": 35,
+            "entry_floor": 8,
+            "dest_floor": 16
+        },
+        {
+            "time": 37,
+            "entry_floor": 12,
+            "dest_floor": 5
+        },
+        {
+            "time": 40,
+            "entry_floor": 14,
+            "dest_floor": 6
+        },
+        {
+            "time": 42,
+            "entry_floor": 17,
+            "dest_floor": 4
+        },
+        {
+            "time": 45,
+            "entry_floor": 1,
+            "dest_floor": 13
+        },
+        {
+            "time": 50,
+            "entry_floor": 18,
+            "dest_floor": 21
+        },
+        {
+            "time": 52,
+            "entry_floor": 19,
+            "dest_floor": 7
+        },
+        {
+            "time": 55,
+            "entry_floor": 20,
+            "dest_floor": 9
+        },
+        {
+            "time": 58,
+            "entry_floor": 22,
+            "dest_floor": 2
+        },
+        {
+            "time": 60,
+            "entry_floor": 11,
+            "dest_floor": 17
+        }
+    ]
+}

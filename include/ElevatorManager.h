@@ -18,22 +18,16 @@ class ElevatorManager{
     Algorithm algo_;
     std::vector<Elevator*> elevators;
     std::vector<std::thread> elevthreads;
-    std::deque<Request> requests;
+    std::deque<Request*> requests;
 
  public:
     ElevatorManager(){};
-    ElevatorManager(Algorithm schedAlgorithm, int nelev);
-    void initElevators(int numofelevators);
+    ElevatorManager(Algorithm schedAlgorithm, int nelev, std::vector<int> startingFloors, int numOfFloors);
+    void initElevators(int numofelevators, std::vector<int> startingFloors, int numOfFloors);
     bool ProcessRequest(Request& elevRequest);
     void ManageElevators();
-    void addRequest(Request& elevRequest);
+    void addRequest(Request* elevRequest);
+    void endSequence();
 };  // class Elevator
 
 
-// struct for parsing
-struct init_data {
-    int num_floors;
-    int num_elev;
-    std::vector<int> starting_floors;
-    std::vector<Request> requests;
-};
