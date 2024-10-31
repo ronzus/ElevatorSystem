@@ -15,6 +15,7 @@ bool end = false;
 
 void Elevator::run()
 {
+    
     int targetFloor = -1;
     while (!end)
     {
