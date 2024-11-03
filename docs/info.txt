@@ -211,3 +211,21 @@ rw_mutex.unlock();
 
 Best Practice: Ideal when you expect more reads than writes, reducing contention between threads.
 
+
+TODO:
+-> Sideways elevator logic 
+-> refine Elevator.cpp logic
+-> Logger (could be a cool option)
+-> RL logic (need to learn tho)
+algos to implement:
+DLB, Dynamic Load Balancing, attempts to equalize the load of all
+cars; HUFF, Highest Unanswered Floor First, gives priority to the highest floor with people
+waiting; LQF, Longest Queue First, gives priority to the queue with the person who has
+been waiting for the longest amount of time; FIM, Finite Intervisit Minimization, a receding
+horizon controller that searches the space of admissible car assignments to minimize a load
+function; ESA, Empty the System Algorithm, a receding horizon controller that searches
+for the fastest way to “empty the system” assuming no new passenger arrivals. FIM is very
+computationally intensive, and would be difficult to implement in real time in its present
+form. ESA uses queue length information that would not be available in a real elevator
+system. ESA/nq is a version of ESA that uses arrival rate information to estimate the queue
+lengths.

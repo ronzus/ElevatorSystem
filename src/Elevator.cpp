@@ -145,6 +145,7 @@ void Elevator::run()
                 // Sort the floorsToVisit by request floor
                 sort(floorsToVisit.begin(), floorsToVisit.end());
 
+
                 // TODO - add init for direction depending on which half has more requests.
 
                 if (direction_ == DIR::UP)
@@ -326,7 +327,6 @@ bool Elevator::moveUP()
     return true;
 };
 
-// consider turning these 2 into 1 ,might be harder to recognize weird behaviors though.
 
 bool Elevator::openDoor()
 {
