@@ -58,7 +58,6 @@ class Elevator {
 
     // Destructor
     ~Elevator() {
-        // Nothing special to clean up here, but included for completeness.
     }
 
     // Copy Constructor
@@ -66,7 +65,6 @@ class Elevator {
         : id_(other.id_), currlevel_(other.currlevel_), direction_(other.direction_),
           isDoorOpen_(other.isDoorOpen_), currLoad_(other.currLoad_), algo(other.algo),
           floorsToVisit(other.floorsToVisit) ,max_floor(other.max_floor) {
-        // Copying a mutex is not allowed, so we don't copy `ReqsMutex`
     }
 
     // Copy Assignment Operator
@@ -118,6 +116,10 @@ class Elevator {
     }
 
     void run();
+    int SCAN();
+    int CSCAN();
+    int LOOK();
+    int CLOOK();
     int calculateClosest();
     bool moveDOWN();
     bool moveUP();

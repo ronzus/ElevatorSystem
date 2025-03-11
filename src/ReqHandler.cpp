@@ -26,6 +26,7 @@ void ReqHandler::processRequests(){
     for (auto& t: thread_vector){
         t.join();
     }
+    //manager_.endSequence(); //signal to Manager all requests have been fulfiled. 
     
 }
 

@@ -3,7 +3,7 @@
     Copyright 2024 Ron Zusman
 */
 
-#include "Elevator.h"
+#include "Algorithms.cpp"
 #include <thread>
 #include <mutex>
 #include <algorithm>
@@ -15,17 +15,18 @@ bool end = false;
 
 void Elevator::run()
 {
-    
+
     int targetFloor = -1;
     while (!end)
     {
         // wait for floorsToVisit.
-          std::unique_lock<std::mutex> lock(this->ReqsMutex);
-        
+        std::unique_lock<std::mutex> lock(this->ReqsMutex);
+
         // Wait until floorsToVisit is not empty (condition variable)
-        this->cv.wait(lock, [&] {
-            return !this->floorsToVisit.empty();  // Wait until there's a request
-        });
+        this->cv.wait(lock, [&]
+                      {
+                          return !this->floorsToVisit.empty(); // Wait until there's a request
+                      });
 
         if (!this->floorsToVisit.empty())
         {
@@ -39,177 +40,29 @@ void Elevator::run()
             }
             case Algorithm::SSTF:
             {
-
                 int closestReq = calculateClosest(); // index
                 targetFloor = floorsToVisit[closestReq];
                 break;
             }
             case Algorithm::SCAN:
-            { // change so it goes to the top floor and not the top requested floor
-
-                // Sort the floorsToVisit by request floor
-                sort(floorsToVisit.begin(), floorsToVisit.end());
-
-                // TODO - add init for direction depending on which half has more requests.
-                
-
-                if (direction_ == DIR::UP)
-                {
-                    // Look for the first request above ot at curr lvl
-                    auto it = std::find_if(this->floorsToVisit.begin(), this->floorsToVisit.end(), [&](int req)
-                                           {
-                                               return req <= this->currlevel_;
-                                           });
-
-                    if (it != floorsToVisit.end())
-                    {
-                        // There's a request above the current level
-                        targetFloor = *it;
-                    }
-                    else
-                    {
-
-                        if (currlevel_ < max_floor)
-                        {
-                            targetFloor = max_floor;
-                        }
-                        else
-                        {
-                            direction_ = DIR::DOWN;
-                            targetFloor = floorsToVisit.back();
-                        }
-                    }
-                }
-                else if (direction_ == DIR::DOWN)
-                {
-
-                    auto it = std::find_if(floorsToVisit.rbegin(), floorsToVisit.rend(), [&](int req)
-                        { return req >= currlevel_; });
-
-                    if (it != floorsToVisit.rend())
-                    {
-
-                        targetFloor = *it;
-                    }
-                    else
-                    {
-                        if (currlevel_ > 0)
-                        {
-                            targetFloor = 0;
-                        }
-                        else
-                        {
-                            direction_ = DIR::UP;
-                            targetFloor = floorsToVisit.front();
-                        }
-                    }
-                }
-
+            {
+                targetFloor = SCAN();
                 break;
             }
             case Algorithm::CSCAN:
             {
-
-                sort(floorsToVisit.begin(), floorsToVisit.end());
-
-                direction_ = DIR::UP;
-
-                auto it = std::find_if(floorsToVisit.begin(), floorsToVisit.end(), [&](int req)
-                                       {
-                                           return req <= currlevel_;
-                                       });
-
-                if (it != floorsToVisit.end())
-                {
-
-                    targetFloor = *it;
-                }
-                else
-                {
-                    if (currlevel_ < max_floor)
-                    {
-                        targetFloor = max_floor;
-                    }
-                    else
-                    {
-                        targetFloor = 0;
-                    }
-                }
-
+                targetFloor = CSCAN();
                 break;
             }
 
             case Algorithm::LOOK:
             {
-
-                // Sort the floorsToVisit by request floor
-                sort(floorsToVisit.begin(), floorsToVisit.end());
-
-
-                // TODO - add init for direction depending on which half has more requests.
-
-                if (direction_ == DIR::UP)
-                {
-                    // Look for the first request above ot at curr lvl
-                    auto it = std::find_if(this->floorsToVisit.begin(), this->floorsToVisit.end(), [&](int req)
-                                           {
-                                               return req <= this->currlevel_;
-                                           });
-
-                    if (it != floorsToVisit.end())
-                    {
-                        // There's a request above the current level
-                        targetFloor = *it;
-                    }
-                    else
-                    {
-                        direction_ = DIR::DOWN;
-                        targetFloor = floorsToVisit.back();
-                    }
-                }
-                else if (direction_ == DIR::DOWN)
-                {
-
-                    auto it = std::find_if(floorsToVisit.rbegin(), floorsToVisit.rend(), [&](int req)
-                                           {
-                                               return req >= currlevel_;
-                                           });
-
-                    if (it != floorsToVisit.rend())
-                    {
-
-                        targetFloor = *it;
-                    }
-                    else
-                    {
-                        direction_ = DIR::UP;
-                        targetFloor = floorsToVisit.front();
-                    }
-                }
-
+                targetFloor = LOOK();
                 break;
             }
             case Algorithm::CLOOK:
             {
-
-                sort(floorsToVisit.begin(), floorsToVisit.end());
-
-                direction_ = DIR::UP;
-
-                auto it = std::find_if(floorsToVisit.begin(), floorsToVisit.end(), [&](int req)
-                                       {
-                                           return req <= currlevel_;
-                                       });
-
-                if (it != floorsToVisit.end())
-                {
-                    targetFloor = *it;
-                }
-                else
-                {
-                    targetFloor = floorsToVisit.front();
-                }
-
+                targetFloor = CLOOK();
                 break;
             }
             default:
@@ -217,6 +70,7 @@ void Elevator::run()
                 break;
             }
             }
+
             // Move towards the target floor step-by-step
             if (currlevel_ < targetFloor)
             {
@@ -225,6 +79,7 @@ void Elevator::run()
                 moveUP();
                 printf("Elevator %d moving up to level %d\n", this->id_, this->currlevel_);
             }
+
             else if (currlevel_ > targetFloor)
             {
                 direction_ = DIR::UP;
@@ -241,13 +96,13 @@ void Elevator::run()
 
                 floorsToVisit.erase(std::remove(floorsToVisit.begin(), floorsToVisit.end(), targetFloor), floorsToVisit.end());
                 // remove exisiting external requests at current floor (due to completion) and add internal requests to queue
-                for (Request* req : external_to_request[currlevel_])
+                for (Request *req : external_to_request[currlevel_])
                 {
                     floorsToVisit.push_back(req->requested_floor);
                     req->status = 0;
                     if (internal_to_request.count(req->requested_floor))
                     {
-                        std::vector<Request*> req_vec;
+                        std::vector<Request *> req_vec;
                         req_vec.push_back(req);
                         internal_to_request.insert({req->requested_floor, req_vec});
                     }
@@ -256,9 +111,10 @@ void Elevator::run()
                         internal_to_request[req->requested_floor].push_back(req);
                     }
                 }
+
                 external_to_request.erase(currlevel_);
                 // remove exisiting internal requests to current floor (due to completion)
-                for (Request* req : internal_to_request[currlevel_])
+                for (Request *req : internal_to_request[currlevel_])
                 {
                     std::unique_lock<std::mutex> lock(req->req_lk);
                     req->status = 1;
@@ -276,9 +132,10 @@ void Elevator::run()
                 }
             }
         }
-
     }
 }
+
+
 
 // returns the index of the closest request in floorsToVisit.
 int Elevator::calculateClosest()
@@ -327,7 +184,6 @@ bool Elevator::moveUP()
     return true;
 };
 
-
 bool Elevator::openDoor()
 {
 
@@ -353,6 +209,9 @@ bool Elevator::closeDoor()
 
     return true;
 }
+
+
+
 
 /*
 
@@ -412,7 +271,7 @@ void Elevator::addRequest(Request &req)
     this->floorsToVisit.push_back(req.entry_floor);
     if (external_to_request.count(req.entry_floor))
     {
-        std::vector<Request*> req_vec;
+        std::vector<Request *> req_vec;
         req_vec.push_back(&req);
         external_to_request.insert({req.entry_floor, req_vec});
     }
@@ -420,10 +279,11 @@ void Elevator::addRequest(Request &req)
     {
         external_to_request[req.entry_floor].push_back(&req);
     }
-    
-    this->cv.notify_all(); 
+
+    this->cv.notify_all();
 }
 
-void Elevator::endOperation(){
+void Elevator::endOperation()
+{
     end = true;
 }

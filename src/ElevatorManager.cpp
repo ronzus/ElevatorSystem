@@ -88,6 +88,11 @@ void ElevatorManager::addRequest(Request* req) {
 
 }
 
-void ElevatorManager::endSequence(){
+/*
+Summary functions
+metrics provided:
+
+*/
+void ElevatorManager::endSequence(std::vector<float> waitingTimes, std::vector<float> responseTimes){
 
 };

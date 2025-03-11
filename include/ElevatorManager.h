@@ -27,7 +27,7 @@ class ElevatorManager{
     bool ProcessRequest(Request& elevRequest);
     void ManageElevators();
     void addRequest(Request* elevRequest);
-    void endSequence();
+    void endSequence(std::vector<float> waitingTimes, std::vector<float> responseTimes);
 };  // class Elevator
 
 
